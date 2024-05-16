@@ -6,7 +6,7 @@ use windows::{
 pub mod tone;
 
 use crate::tone::ToneGenerator;
-fn main() -> Result<()> {
+fn main() -> windows::core::Result<()> {
     unsafe {
         CoInitializeEx(None, COINIT_MULTITHREADED).ok()?;
         let device = get_output_device()?;
@@ -41,6 +41,7 @@ unsafe fn get_output_device() -> Result<IMMDevice> {
     let device = device_enumerator.GetDefaultAudioEndpoint(eRender, eConsole)?;
     Ok(device)
 }
+
 unsafe fn get_input_device() -> Result<IMMDevice> {
     let device_enumerator: IMMDeviceEnumerator =
         CoCreateInstance(&MMDeviceEnumerator, None, CLSCTX_ALL)?;
@@ -99,8 +100,8 @@ unsafe fn play_audio_stream(device: &IMMDevice) -> Result<()> {
     let render_client: IAudioRenderClient = audio_client.GetService()?;
     audio_client.Start()?;
 
-    while elapsed.as_millis() < 5000 {
-        std::thread::sleep(Duration::from_millis(250));
+    while elapsed.as_millis() < 3000 {
+        std::thread::sleep(Duration::from_millis(500));
         let num_frames_padding = audio_client.GetCurrentPadding()?;
         let buffer_size = audio_client.GetBufferSize()?;
         let num_frames_available = buffer_size - num_frames_padding;
